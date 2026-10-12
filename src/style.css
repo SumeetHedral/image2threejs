@@ -40,3 +40,4 @@ footer a { color:var(--acc); }
 #benchResults td.win { color:#22c55e; font-weight:600; }
 #benchResults p { margin:8px 0 0; color:var(--mut); font-size:12px; }
 #benchResults p.warn { color:#f59e0b; }
+#benchResults p.warn { color:#f59e0b; }
