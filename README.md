@@ -9,7 +9,8 @@ Drop an image, get an interactive 3D model, entirely in your browser. No server,
 1. The image is downscaled and sent to [Depth Anything V2 (small)](https://huggingface.co/onnx-community/depth-anything-v2-small), running on-device via [Transformers.js](https://github.com/huggingface/transformers.js) (WebGPU, falling back to WASM). The ~25 MB model downloads once and is cached.
 2. The depth map displaces a Three.js grid mesh textured with your image.
 3. Sliders control depth strength, background cut-off and smoothing. Triangles that span depth cliffs are dropped for a cleaner silhouette.
-4. **Download .glb** exports the mesh and texture.
+4. A **WebGL / WebGPU** switch (top right of the viewer) renders the same scene with either backend. WebGPU is disabled where the browser lacks it.
+5. **Download .glb** exports the mesh and texture.
 
 This is a relief reconstruction from a single view: hidden sides are not modelled.
 

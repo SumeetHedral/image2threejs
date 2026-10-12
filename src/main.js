@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { WebGPURenderer } from 'three/webgpu';
 import { pipeline } from '@huggingface/transformers';
 
 const MODEL_ID = 'onnx-community/depth-anything-v2-small';
@@ -9,19 +10,21 @@ const GRID = 240; // mesh segments along the longest side
 const STRETCH_LIMIT = 0.3; // drop triangles spanning a depth cliff (normalized depth)
 
 const $ = (id) => document.getElementById(id);
-const canvas = $('view');
+const canvasGL = $('view');
+const canvasGPU = $('viewGpu');
+const stage = $('stage');
 const dropEl = $('drop');
 const statusEl = $('status');
 const controlsEl = $('controls');
 
 // ---------- three.js scene ----------
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: false });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const glRenderer = new THREE.WebGLRenderer({ canvas: canvasGL, antialias: true });
+let gpuRenderer = null; // created lazily on first switch
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(matchMedia('(prefers-color-scheme: light)').matches ? 0xffffff : 0x181b22);
 const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 50);
 camera.position.set(0, 0, 3);
-const orbit = new OrbitControls(camera, canvas);
+const orbit = new OrbitControls(camera, canvasGL);
 orbit.enableDamping = true;
 orbit.autoRotateSpeed = 1.2;
 scene.add(new THREE.HemisphereLight(0xffffff, 0x445066, 1.6));
@@ -29,20 +32,65 @@ const key = new THREE.DirectionalLight(0xffffff, 2.2);
 key.position.set(2, 3, 4);
 scene.add(key);
 
+let active = glRenderer;
+let mode = 'webgl';
+
 function resize() {
-  const { clientWidth: w, clientHeight: h } = canvas;
-  renderer.setSize(w, h, false);
+  const { clientWidth: w, clientHeight: h } = stage;
+  for (const r of [glRenderer, gpuRenderer]) {
+    if (!r) continue;
+    r.setPixelRatio(Math.min(devicePixelRatio, 2));
+    r.setSize(w, h, false);
+  }
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
 }
-new ResizeObserver(resize).observe(canvas);
+new ResizeObserver(resize).observe(stage);
 resize();
 
-renderer.setAnimationLoop(() => {
+function loop() {
   orbit.autoRotate = $('spin').checked;
   orbit.update();
-  renderer.render(scene, camera);
-});
+  active.render(scene, camera);
+}
+glRenderer.setAnimationLoop(loop);
+
+const modeButtons = { webgl: $('mode-webgl'), webgpu: $('mode-webgpu') };
+if (!navigator.gpu) {
+  modeButtons.webgpu.disabled = true;
+  modeButtons.webgpu.title = 'WebGPU is not available in this browser';
+}
+
+async function setMode(next) {
+  if (next === mode) return;
+  try {
+    if (next === 'webgpu') {
+      if (!gpuRenderer) {
+        gpuRenderer = new WebGPURenderer({ canvas: canvasGPU, antialias: true });
+        await gpuRenderer.init();
+      }
+      glRenderer.setAnimationLoop(null);
+      active = gpuRenderer;
+    } else {
+      gpuRenderer?.setAnimationLoop(null);
+      active = glRenderer;
+    }
+    const [on, off] = next === 'webgpu' ? [canvasGPU, canvasGL] : [canvasGL, canvasGPU];
+    on.hidden = false;
+    off.hidden = true;
+    orbit.disconnect();
+    orbit.connect(on);
+    resize();
+    active.setAnimationLoop(loop);
+    mode = next;
+    for (const [k, b] of Object.entries(modeButtons)) b.classList.toggle('on', k === next);
+  } catch (err) {
+    console.error(err);
+    setStatus(`Could not start ${next}: ${err.message}`);
+  }
+}
+modeButtons.webgl.addEventListener('click', () => setMode('webgl'));
+modeButtons.webgpu.addEventListener('click', () => setMode('webgpu'));
 
 // ---------- depth model ----------
 let depthModel;
@@ -146,7 +194,7 @@ function buildMesh(texCanvas, depthImg) {
 
   const map = new THREE.CanvasTexture(texCanvas);
   map.colorSpace = THREE.SRGBColorSpace;
-  map.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  map.anisotropy = glRenderer.capabilities.getMaxAnisotropy();
   const mat = new THREE.MeshStandardMaterial({ map, side: THREE.DoubleSide, roughness: 0.85, metalness: 0 });
   const mesh = new THREE.Mesh(geo, mat);
   scene.add(mesh);

@@ -16,6 +16,11 @@
 
     <section id="stage">
       <canvas id="view"></canvas>
+      <canvas id="viewGpu" hidden></canvas>
+      <div id="modes" role="group" aria-label="Renderer">
+        <button id="mode-webgl" class="on">WebGL</button>
+        <button id="mode-webgpu">WebGPU</button>
+      </div>
       <label id="drop" for="file">
         <strong>Drop an image here</strong>
         <span>or click to choose · or paste from clipboard</span>
