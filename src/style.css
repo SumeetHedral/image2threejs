@@ -28,3 +28,15 @@ footer a { color:var(--acc); }
 #modes button { border:0; border-radius:0; background:transparent; color:var(--mut); padding:4px 12px; font-size:13px; }
 #modes button.on { background:var(--acc); color:#fff; }
 #modes button:disabled { opacity:.4; cursor:not-allowed; }
+#metrics { position:absolute; top:12px; left:12px; z-index:2; margin:0; padding:8px 10px; max-width:calc(100% - 190px); pointer-events:none;
+  font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:color-mix(in srgb, var(--panel) 85%, transparent);
+  border:1px solid var(--line); border-radius:8px; white-space:pre-wrap; }
+#controls select { font:inherit; font-size:13px; padding:2px 6px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--fg); }
+#benchResults { padding:12px 16px; background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow-x:auto; }
+#benchResults h2 { margin:0 0 8px; font-size:16px; } #benchResults small { color:var(--mut); font-weight:400; margin-left:8px; }
+#benchResults table { border-collapse:collapse; font-size:13px; min-width:100%; }
+#benchResults th, #benchResults td { text-align:right; padding:4px 10px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; }
+#benchResults th:first-child, #benchResults tbody th { text-align:left; }
+#benchResults td.win { color:#22c55e; font-weight:600; }
+#benchResults p { margin:8px 0 0; color:var(--mut); font-size:12px; }
+#benchResults p.warn { color:#f59e0b; }
