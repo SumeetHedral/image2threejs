@@ -1,0 +1,20 @@
+{
+  "name": "image2threejs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Drop an image, get an interactive 3D relief in your browser. Runs fully client-side.",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.3.1",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "vite": "^8.3.4"
+  }
+}

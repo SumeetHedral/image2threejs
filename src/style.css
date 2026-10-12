@@ -1,0 +1,26 @@
+:root { --bg:#0f1115; --panel:#181b22; --line:#2a2f3a; --fg:#e8eaf0; --mut:#8b93a7; --acc:#6ea8ff; }
+@media (prefers-color-scheme: light) {
+  :root { --bg:#f4f5f8; --panel:#fff; --line:#d9dce4; --fg:#1b1e26; --mut:#5d6578; --acc:#2563eb; }
+}
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui,-apple-system,sans-serif; }
+#app { max-width:1000px; margin:0 auto; padding:24px 16px; display:grid; gap:16px; }
+h1 { margin:0; font-size:28px; }
+header p { margin:4px 0 0; color:var(--mut); }
+#stage { position:relative; aspect-ratio:4/3; background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+#view { position:absolute; inset:0; width:100%; height:100%; display:block; }
+#drop { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  border:2px dashed var(--line); border-radius:12px; margin:12px; cursor:pointer; text-align:center; transition:.15s; }
+#drop span { color:var(--mut); font-size:13px; }
+#drop.over, #drop:hover { border-color:var(--acc); background:color-mix(in srgb, var(--acc) 8%, transparent); }
+#drop.hidden { display:none; }
+#status { position:absolute; left:12px; bottom:12px; right:12px; padding:8px 12px; background:color-mix(in srgb, var(--panel) 90%, transparent);
+  border:1px solid var(--line); border-radius:8px; font-size:13px; }
+#controls { display:flex; flex-wrap:wrap; gap:12px 20px; align-items:center; padding:12px 16px; background:var(--panel); border:1px solid var(--line); border-radius:12px; }
+#controls label { display:flex; gap:8px; align-items:center; font-size:13px; color:var(--mut); }
+#controls input[type=range] { width:130px; accent-color:var(--acc); }
+button { font:inherit; padding:6px 14px; border-radius:8px; border:1px solid var(--acc); background:var(--acc); color:#fff; cursor:pointer; }
+button.ghost { background:transparent; color:var(--fg); border-color:var(--line); }
+footer { color:var(--mut); font-size:12px; }
+footer a { color:var(--acc); }
+[hidden] { display:none !important; }

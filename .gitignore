@@ -1,0 +1,6 @@
+node_modules
+dist
+.DS_Store
+# local skill symlink (see README)
+.claude/skills/
+.img2threejs/
